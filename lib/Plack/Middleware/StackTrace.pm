@@ -22,15 +22,19 @@ sub call {
         die @_;
     };
 
-    my $res = try { $self->app->($env) };
-
-    if ($trace && (!$res or $res->[0] == 500)) {
-        if (($env->{HTTP_ACCEPT} || '*/*') =~ /html/) {
-            $res = [500, ['Content-Type' => 'text/html; charset=utf-8'], [ $trace->as_html ]];
-        } else {
-            $res = [500, ['Content-Type' => 'text/plain; charset=utf-8'], [ $trace->as_string ]];
-        }
+    my $res = try {
+        $self->app->($env);
     }
+    catch {
+        my $accept = $env->{HTTP_ACCEPT};
+        my $use_html = $accept =~ qr(\*/\*)
+            || $accept =~ qr(text/\*)
+            || $accept =~ qr(html);
+
+        my $type = $use_html ? 'text/html' : 'text/plain';
+        my $body = $use_html ? $trace->as_html : $trace->as_string;
+        [ 500, ['Content-Type' => "$type; charset=utf-8"], [ $body ]];
+    };
 
     # break $trace here since $SIG{__DIE__} holds the ref to it, and
     # $trace has refs to Standalone.pm's args ($conn etc.) and
