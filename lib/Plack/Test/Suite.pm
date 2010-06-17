@@ -161,15 +161,15 @@ our @TEST = (
         'bigger file',
         sub {
             my $cb  = shift;
-            my $res = $cb->(GET "http://127.0.0.1/kyoto.jpg");
+            my $res = $cb->(GET "http://127.0.0.1/baybridge.jpg");
             is $res->code, 200;
             is $res->header('content_type'), 'image/jpeg';
-            is length $res->content, 2397701;
-            is Digest::MD5::md5_hex($res->content), '9c6d7249a77204a88be72e9b2fe279e8';
+            is length $res->content, 79838;
+            is Digest::MD5::md5_hex($res->content), '983726ae0e4ce5081bef5fb2b7216950';
         },
         sub {
             my $env = shift;
-            open my $fh, '<', "$share_dir/kyoto.jpg";
+            open my $fh, '<', "$share_dir/baybridge.jpg";
             binmode $fh;
             return [
                 200,
@@ -308,12 +308,7 @@ our @TEST = (
         },
     ],
     [
-        # PEP-333 says:
-        #    If the iterable returned by the application has a close() method,
-        #   the server or gateway must call that method upon completion of the
-        #   current request, whether the request was completed normally, or
-        #   terminated early due to an error. 
-        'call close after read file-like',
+        'call close after read IO::Handle-like',
         sub {
             my $cb  = shift;
             my $res = $cb->(GET "http://127.0.0.1/call_close");
@@ -322,14 +317,13 @@ our @TEST = (
         sub {
             my $env = shift;
             {
-                package CalledClose;
                 our $closed = -1;
-                sub new { $closed = 0; my $i=0; bless \$i, 'CalledClose' }
-                sub getline {
+                sub CalledClose::new { $closed = 0; my $i=0; bless \$i, 'CalledClose' }
+                sub CalledClose::getline {
                     my $self = shift;
                     return $$self++ < 4 ? $$self : undef;
                 }
-                sub close     { ::ok(1, 'closed') if defined &::ok }
+                sub CalledClose::close { ::ok(1, 'closed') if defined &::ok }
             }
             return [
                 200,
@@ -679,13 +673,29 @@ sub test_app_handler {
 1;
 __END__
 
+=head1 NAME
+
+Plack::Test::Suite - Test suite for Plack handlers
+
 =head1 SYNOPSIS
 
-  # TBD See t/Plack-Servet/*.t for now
+  use Test::More;
+  use Plack::Test::Suite;
+  Plack::Test::Suite->run_server_tests('Your::Handler');
+  done_testing;
 
 =head1 DESCRIPTION
 
-Plack::Test::Suite is a test suite to test a new PSGI server implementation.
+Plack::Test::Suite is a test suite to test a new PSGI server
+implementation. It automatically loads a new handler environment and
+uses LWP to send HTTP requests to the local server to make sure your
+handler implements the PSGI specification correctly.
+
+Note that the handler name doesn't include the C<Plack::Handler::>
+prefix, i.e. if you have a new Plack handler Plack::Handler::Foo, your
+test script would look like:
+
+  Plack::Test::Suite->run_server_tests('Foo');
 
 =head1 AUTHOR
 

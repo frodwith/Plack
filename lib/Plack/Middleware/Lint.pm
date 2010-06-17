@@ -6,6 +6,16 @@ use parent qw(Plack::Middleware);
 use Scalar::Util qw(blessed);
 use Plack::Util;
 
+sub wrap {
+    my($self, $app) = @_;
+
+    unless (ref $app eq 'CODE' or overload::Method($app, '&{}')) {
+        Carp::croak("PSGI app should be a code reference: ", (defined $app ? $app : "undef"));
+    }
+
+    $self->SUPER::wrap($app);
+}
+
 sub call {
     my $self = shift;
     my $env = shift;
@@ -79,7 +89,7 @@ sub validate_res {
     my $croak = $streaming ? \&Carp::confess : \&Carp::croak;
 
     unless (ref($res) and ref($res) eq 'ARRAY' || ref($res) eq 'CODE') {
-        $croak->('response should be arrayref or coderef');
+        $croak->('response should be array ref or code ref');
     }
 
     if (ref $res eq 'CODE') {
@@ -127,18 +137,28 @@ Plack::Middleware::Lint - Validate request and response
   my $app = sub { ... }; # your app or middleware
   $app = Plack::Middleware::Lint->wrap($app);
 
+  # Or from plackup
+  plackup -e 'enable "Lint"' myapp.psgi
+
 =head1 DESCRIPTION
 
 Plack::Middleware::Lint is a middleware component to validate request
-and response environment. You are strongly suggested to use enable
-this middleware when you develop a framework adapter or a new server
-that implements PSGI interface.
+and response environment formats. You are strongly suggested to use
+this middleware when you develop a new framework adapter or a new PSGI
+web server that implements the PSGI interface.
+
+This middleware is enabled by default when you run plackup or other
+launcher tools with the default environment I<development> value.
 
 =head1 AUTHOR
 
 Tatsuhiko Miyagawa
 
 Tokuhiro Matsuno
+
+=head1 SEE ALSO
+
+L<Plack>
 
 =cut
 

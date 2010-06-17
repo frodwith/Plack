@@ -17,12 +17,12 @@ my $url = 'http://127.0.0.1/';
 my @try = (
     [ 'AnyEvent::HTTPD' ],
     [ 'HTTP::Server::PSGI' ],
-    [ 'HTTP::Server::PSGI', ' (workers=10)', max_workers => 10 ],
     [ 'Twiggy' ],
     [ 'HTTP::Server::Simple' ],
     [ 'Corona' ],
     [ 'Danga::Socket' ],
     [ '+POE::Component::Server::PSGI' ],
+    [ 'Starlet', ' (workers=10)', max_workers => 10 ],
     [ 'Starman', ' (workers=10)', workers => 10 ],
 );
 

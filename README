@@ -12,14 +12,17 @@ DESCRIPTION
 MODULES AND UTILITIES
   Plack::Handler
     Plack::Handler and its subclasses contains adapters for web servers. We
-    have adapters for Standalone, CGI, FCGI, Apache, AnyEvent, Coro,
-    Danga::Socket and many server environments that you can run PSGI
-    applications on.
+    have adapters for the built-in standalone web server HTTP::Server::PSGI,
+    CGI, FCGI, Apache1, Apache2, Net::FastCGI and HTTP::Server::Simple
+    included in the core Plack distribution.
+
+    There are also many HTTP server implementations on CPAN that has Plack
+    handlers.
 
     See Plack::Handler how to write your own adapters.
 
   Plack::Loader
-    Plack::Loader is a loader to load one of Plack::Server adapters and run
+    Plack::Loader is a loader to load one of Plack::Handler adapters and run
     PSGI application code reference with it.
 
   Plack::Util
@@ -90,8 +93,13 @@ MODULES AND UTILITIES
 CONTRIBUTING
   Patches and Bug Fixes
     Small patches and bug fixes can be either submitted via nopaste on IRC
-    <irc://irc.perl.org/#plack> or email. You could also fork on github
-    (http://github.com/miyagawa/Plack) to make larger fixes.
+    <irc://irc.perl.org/#plack> or the github issue tracker
+    <http://github.com/miyagawa/Plack/issues>. Forking on github
+    <http://github.com/miyagawa/Plack> is another good way if you intend to
+    make larger fixes.
+
+    See also <http://contributing.appspot.com/plack> when you think this
+    document is terribly outdated.
 
   Module Namespaces
     Modules added to the Plack:: sub-namespaces should be reasonably generic
@@ -117,11 +125,14 @@ CONTRIBUTING
     it's supposed to run on CGI and that is a really bad choice and confuse
     people.
 
-COPYRIGHT
-    Copyright 2009- Tatsuhiko Miyagawa
-
 AUTHOR
     Tatsuhiko Miyagawa
+
+COPYRIGHT
+    The following copyright notice applies to all the files provided in this
+    distribution, including binary files, unless explicitly noted otherwise.
+
+    Copyright 2009-2010 Tatsuhiko Miyagawa
 
 CONTRIBUTORS
     Yuval Kogman (nothingmuch)
@@ -130,7 +141,7 @@ CONTRIBUTORS
 
     Kazuhiro Osawa (Yappo)
 
-    Kzzuho Oku
+    Kazuho Oku
 
     Florian Ragwitz (rafl)
 
