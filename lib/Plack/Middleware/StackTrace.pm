@@ -35,16 +35,6 @@ sub call {
             $res = [500, ['Content-Type' => 'text/plain; charset=utf-8'], [ utf8_safe($text) ]];
         }
     }
-    catch {
-        my $accept = $env->{HTTP_ACCEPT};
-        my $use_html = $accept =~ qr(\*/\*)
-            || $accept =~ qr(text/\*)
-            || $accept =~ qr(html);
-
-        my $type = $use_html ? 'text/html' : 'text/plain';
-        my $body = $use_html ? $trace->as_html : $trace->as_string;
-        [ 500, ['Content-Type' => "$type; charset=utf-8"], [ $body ]];
-    };
 
     # break $trace here since $SIG{__DIE__} holds the ref to it, and
     # $trace has refs to Standalone.pm's args ($conn etc.) and
